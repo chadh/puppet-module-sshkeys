@@ -1,7 +1,7 @@
   define sshkeys::privatekey (
     $user,
     $host,
-    $type
+    $type = 'rsa'
   ) {
     $typeopt = $type ? {
       'rsa' => '--rsa',

@@ -7,7 +7,7 @@ define sshkeys::authorizedkey (
   $srchost,
   $dstuser,
   $authorizedkey_file,
-  $keytype,
+  $keytype = 'rsa',
 ) {
    #FIXME This is a total hack.  sshkeys.pl returns a key in the form "options ssh-rsa KEY foo@bar"
    # so we split them out here.  Really, we should refactor the sshkeys.pl script (or store them elsewhere)

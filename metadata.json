@@ -10,11 +10,11 @@
   "checksums": {
     "Modulefile": "2e9d07cb9eab039bedf06e22115a88ae",
     "README": "5c2708b09fc91541c72ec94edaa397bb",
-    "hieradata/common.yaml": "72d903968ca64c0af2f10f000723a843",
-    "manifests/authorizedkey.pp": "547ddd10635eee6e3c3e4a0bd6077c0b",
+    "hieradata/common.yaml": "ea4d7e4859ecb8e508e916169be52437",
+    "manifests/authorizedkey.pp": "b1d2c3ce8d5788360e4d4d09959c8df3",
     "manifests/init.pp": "a95edf76a889f55286ed7dee375dd735",
     "manifests/install.pp": "7991d4f7b3f9cf7f698f576e2daf1401",
-    "manifests/privatekey.pp": "92a92b1fdd7b1294586e701afbc444b8",
+    "manifests/privatekey.pp": "dd9ed434f125a8a79eb5cbce98a24589",
     "templates/sshkeys.pl.erb": "8113bc7a15d4e48b401fb7f3f966b9a9"
   },
   "dependencies": [

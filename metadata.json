@@ -15,7 +15,7 @@
     "manifests/init.pp": "a95edf76a889f55286ed7dee375dd735",
     "manifests/install.pp": "7991d4f7b3f9cf7f698f576e2daf1401",
     "manifests/privatekey.pp": "a5f1207632dd4b4995f85435139b3ac9",
-    "templates/sshkeys.pl.erb": "b3a3bd92f71c0687b965ff5876c55bfe"
+    "templates/sshkeys.pl.erb": "c4c89ffc9325bbc5ce4a9878fd1bd9ea"
   },
   "dependencies": [
     {

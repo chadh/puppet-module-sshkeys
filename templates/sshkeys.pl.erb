@@ -18,8 +18,8 @@ our $known_hosts = $hostkeydir . '/ssh_known_hosts';
 <% if knownhosts_servedir != 'UNSET' then -%>
 our $known_hosts_copy = '<%= knownhosts_servedir %>/ssh_known_hosts';
 <% else -%>
-our $known_hosts_copy = ''
-<% end if -%>
+our $known_hosts_copy = '';
+<% end -%>
 our $verbose = '';
 
 sub usage {

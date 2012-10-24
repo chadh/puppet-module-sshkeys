@@ -2,7 +2,14 @@
 # $srcuser@$srchost to login as $dstuser on *this host* ($::hostname)"
 # $srcuser is only used as a comment on the key, and as an identifier to locate
 # the key in the keystore (ie, the filename of the key)
-define sshkeys::authorizedkey ($srcuser, $srchost, $dstuser, $authorizedkey_file = 'UNSET', $keytype = 'rsa',) {
+define sshkeys::authorizedkey (
+  $srcuser,
+  $srchost,
+  $dstuser,
+  $ensure = 'present',
+  $authorizedkey_file = 'UNSET',
+  $keytype = 'rsa',
+) {
   # FIXME This is a total hack.  sshkeys.pl returns a key in the form "options ssh-rsa KEY foo@bar"
   # so we split them out here.  Really, we should refactor the sshkeys.pl script (or store them elsewhere)
   $key = generate($sshkeys::install::scriptname, '--user', $srcuser, "--${keytype}", '--authkeys', $srchost, '--cmthost', $srchost)
@@ -21,7 +28,7 @@ define sshkeys::authorizedkey ($srcuser, $srchost, $dstuser, $authorizedkey_file
     }
   } else {
     ssh_authorized_key { $name:
-      ensure  => present,
+      ensure  => $ensure,
       key     => $rawkey,
       options => $keyopts,
       user    => $dstuser,

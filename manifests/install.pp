@@ -22,5 +22,10 @@ class sshkeys::install(
     owner  => $user,
     group  => 'root',
   }
-  
+
+  cron { 'genknownhosts':
+    command => "$scriptname --genknownhosts",
+    user    => 'root',
+    minute  => [ 0,10,20,30,40,50 ],
+  }  
 }

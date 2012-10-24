@@ -11,7 +11,7 @@ define sshkeys::authorizedkey (
 ) {
    #FIXME This is a total hack.  sshkeys.pl returns a key in the form "options ssh-rsa KEY foo@bar"
    # so we split them out here.  Really, we should refactor the sshkeys.pl script (or store them elsewhere)
-   $key = generate("${sshkeys::store::bindir}/sshkeys.pl", '--user', $srcuser, "--${keytype}", '--authkeys', $srchost, '--cmthost', $srchost)
+   $key = generate("${sshkeys::install::bindir}/sshkeys.pl", '--user', $srcuser, "--${keytype}", '--authkeys', $srchost, '--cmthost', $srchost)
    $rawkeyarr = split($key,' ')
    $keyopts = $rawkeyarr[0]
    $rawkey = $rawkeyarr[2]

@@ -15,7 +15,7 @@ our $userkeydir = '<%= userkeydir %>';
 our $keygen = '<%= keygen %>';
 our $keygenargs = "<%= keygenopts %>";
 our $known_hosts = $hostkeydir . '/ssh_known_hosts';
-<% if $knownhosts_servedir != 'UNSET' then -%>
+<% if knownhosts_servedir != 'UNSET' then -%>
 our $known_hosts_copy = '<%= knownhosts_servedir %>/ssh_known_hosts';
 <% else -%>
 our $known_hosts_copy = ''

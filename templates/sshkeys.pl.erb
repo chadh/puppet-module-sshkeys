@@ -1,0 +1,353 @@
+#!/usr/bin/perl -w
+
+use strict 'vars';
+use strict 'subs';
+
+use Fcntl qw ( :flock );
+use Getopt::Long qw( :config no_ignore_case bundling );
+use File::Copy;
+#use Sys::Hostname;
+use Net::Domain qw(hostfqdn);
+use IO::Socket;
+
+our $hostkeydir = '<%= hostkeydir %>';
+our $userkeydir = '<%= userkeydir %>';
+our $keygen = '<%= keygen %>';
+our $keygenargs = "<%= keygenopts %>";
+our $known_hosts = $hostkeydir . '/ssh_known_hosts';
+<% if $knownhosts_servedir != 'UNSET' then -%>
+our $known_hosts_copy = '<%= knownhosts_servedir %>/ssh_known_hosts';
+<% else -%>
+our $known_hosts_copy = ''
+<% end if -%>
+our $verbose = '';
+
+sub usage {
+my ($ret) = @_;
+
+print <<END;
+
+hostkeys.pl [options]  --host fqdn | --user username | --addauth 
+                       --genknownhosts | --genauthkeys userlist
+
+Options:
+    --help	this message
+    --rsa	return RSA version of key
+    --dsa	return DSA version of key
+    --cmthost	hostname to put in key comment
+    --authkeys  hostname to allow in authorized_keys file
+    --private	return private key (default is public)
+    --escquotes escape quote characters
+    --verbose	print extra information
+END
+
+exit $ret;
+}
+
+sub exlock {
+  my ($fh, $timeout) = @_;
+
+  if ( ! defined $fh ) {
+    die "exlock called without argument!";
+  } 
+
+  if ( ! defined $timeout ) {
+    $timeout = 0;
+  }
+
+  my $i = 0;
+  while ( $i <= $timeout and ! flock($fh,LOCK_EX|LOCK_NB) ) {
+    $i += 5;
+  }
+
+  return ($i <= $timeout);
+}
+
+sub shlock {
+  my ($fh, $timeout) = @_;
+
+  if ( ! defined $fh ) {
+    die "shlock called without argument!";
+  } 
+
+  if ( ! defined $timeout ) {
+    $timeout = 0;
+  }
+
+  my $i = 0;
+  while ( $i <= $timeout and ! flock($fh,LOCK_SH|LOCK_NB) ) {
+    $i += 5;
+  }
+
+  return ($i <= $timeout);
+}
+
+# generate ssh host key, replacing current key if it exists
+sub gen_key {
+  my ($keyname, $type, $cmt) = @_;
+
+  if ( ! defined $keyname ) {
+    die "gen_key: no key name";
+  }
+
+  if ( ! defined $type ) {
+    $type = 'rsa';
+  }
+
+  if ( -f $keyname ) {
+    unlink $keyname;
+  }
+  if ( -f "$keyname.pub" ) {
+     unlink "$keyname.pub";
+  }
+
+  return 0 == system("$keygen $keygenargs -C \'$cmt\' -t $type -f $keyname");
+}
+
+sub gen_ssh_host_key {
+  my ($hostname,$type,$private) = @_;
+  my $lockfile = "$hostkeydir/.$hostname.lck";
+  my $keyname;
+
+  if ( $private ) {
+    $keyname = "$hostkeydir/$hostname.$type";
+  } else {
+    $keyname = "$hostkeydir/$hostname.$type.pub";
+  }
+
+  gen_ssh_key($keyname, $lockfile, $type, $private, '');
+  if ( ! -f $lockfile ) {
+    open(KEYLOCK,'>',$lockfile) or die "Unable to create lock file ($lockfile)";
+  } else {
+    open(KEYLOCK,'<',$lockfile) or die "Unable to open lock file ($lockfile)";
+  }
+  if ( shlock('KEYLOCK',5) ) {
+      open(KEYFILE,'<',$keyname);
+      print while(<KEYFILE>);
+      close(KEYFILE);
+  } else {
+    close(KEYLOCK);
+    die "Unable to get shared lock on $lockfile";
+  } 
+  close(KEYLOCK);
+}
+
+sub gen_ssh_user_key {
+  my ($username,$type,$private,$cmthost,$authkeyshost,$escquotes) = @_;
+  my $lockfile = "$userkeydir/.$username.$cmthost.lck";
+  my $keyname;
+
+  if ( $private ) {
+    $keyname = "$userkeydir/$username.$cmthost.$type";
+  } else {
+    $keyname = "$userkeydir/$username.$cmthost.$type.pub";
+  }
+
+  my $authkeyshostip;
+  if ( $authkeyshost ) {
+    my $packed_ip = gethostbyname($authkeyshost);
+    if ( ! $packed_ip ) {
+      if ( $verbose ) {
+        print "WARNING: Could not resolve host $authkeyshost\n";
+      }
+    } else {
+      $authkeyshostip = inet_ntoa($packed_ip);
+    }
+  }
+
+  gen_ssh_key($keyname,$lockfile,$type,$private,"$username\@$cmthost");
+  if ( $authkeyshostip ) { 
+    if ( $escquotes ) {
+      print "from=\\\"$authkeyshostip,::ffff:$authkeyshostip\\\" ";
+    } else {
+      print "from=\"$authkeyshostip,::ffff:$authkeyshostip\" ";
+    }
+  }
+  if ( ! -f $lockfile ) {
+    open(KEYLOCK,'>',$lockfile) or die "Unable to create lock file ($lockfile)";
+  } else {
+    open(KEYLOCK,'<',$lockfile) or die "Unable to open lock file ($lockfile)";
+  }
+  if ( shlock('KEYLOCK',5) ) {
+      open(KEYFILE,'<',$keyname);
+      if ( $escquotes ) {
+        while(<KEYFILE>) { chomp; print; }
+      } else {
+        print while(<KEYFILE>);
+      }
+      close(KEYFILE);
+  } else {
+    close(KEYLOCK);
+    die "Unable to get shared lock on $lockfile";
+  } 
+  close(KEYLOCK);
+}
+
+sub gen_ssh_key {
+  my ($keyname, $lockfile, $type, $private, $cmt) = @_;
+
+  if ( ! -f $lockfile ) {
+    open(KEYLOCK,'>',$lockfile) or die "Unable to create lock file ($lockfile)";
+  } else {
+    open(KEYLOCK,'<',$lockfile) or die "Unable to open lock file ($lockfile)";
+  }
+  if ( shlock('KEYLOCK',5) ) {
+    if ( ! -r $keyname ) {
+      # keyfile doesn't exist, so generate it and return it
+      if ( $private ) {
+        if ( exlock('KEYLOCK',5) ) {
+          gen_key($keyname,$type,$cmt);
+        }
+      } else {
+        # we can generate the public key if the private key is available
+        $keyname =~ s/\.pub$//;
+        if ( -r $keyname ) {
+          if ( exlock('KEYLOCK',5) ) {
+            # private key exists, so just generate a public key from that
+            if ( 0 == system("$keygen -q -y -f $keyname > $keyname.pub") ) {
+              # this is a little anal, but I really want to preserve the
+              # comment, but the comment isn't saved with the private key
+              open(KEYFILE,'<',"$keyname.pub");
+              my @lines = <KEYFILE>;
+              close(KEYFILE);
+              chomp($lines[0]);
+              my $pubkey = $lines[0];
+              open(KEYFILE,'>',"$keyname.pub");
+              print KEYFILE "$pubkey $cmt";
+              close(KEYFILE);
+            } else {
+              close(KEYLOCK);
+              die "failed to generate public key from '$keyname'";
+            }
+          } else {
+            close(KEYLOCK);
+            die "unable to get exclusive lock to generate public key";
+          }
+        } else {
+          # public and private key files do not exist, so we need to generate
+          if ( exlock('KEYLOCK',5) ) {
+            gen_key($keyname,$type,$cmt);
+          }
+        }
+      }
+    }
+  } else {
+    close(KEYLOCK);
+    die "Unable to acquire shared lock";
+  }
+
+  close(KEYLOCK);
+}
+
+sub gen_known_hosts {
+  open(KHLOCK,'<',"$hostkeydir/.known_hosts.lck") or die "Unable to open lock file";
+  if ( ! exlock('KHLOCK',5) ) {
+    die "Unable to obtain exclusive lock on known_hosts file";
+  }
+  open(KHFILE, '>', $known_hosts);
+  chdir $hostkeydir;
+  my $unkhostname;
+  my @hostkeys = <*.rsa.pub>;
+  foreach my $hostkey (@hostkeys) {
+    $unkhostname = undef;
+    my $hostname = $hostkey;
+    $hostname =~ s/(.*?)\.rsa\.pub/$1/;
+    my $packed_ip = gethostbyname($hostname);
+    if ( ! defined $packed_ip ) {
+      if ( $verbose ) {
+        print "Warning: Hostname $hostname does not resolve.\n";
+      }
+      $unkhostname = 1;
+    }
+    my $ip;
+    $ip = inet_ntoa($packed_ip) unless $unkhostname;
+    my $shorthostname = $hostname;
+    $shorthostname =~ s/([^.]*)\..*/$1/;
+    if ( ! -f "$hostkeydir/.$hostname.lck" ) {
+      open(KEYLOCK,'>',"$hostkeydir/.$hostname.lck") or die "Unable to create lock file";
+    } else {
+      open(KEYLOCK,'<',"$hostkeydir/.$hostname.lck") or die "Unable to open lock file";
+    }
+    if ( shlock('KEYLOCK',5) ) {
+      open(KEYFILE,'<',$hostkey);
+      if ( $ip ) {
+        while(<KEYFILE>) { print KHFILE "$hostname,$shorthostname,$ip " . $_; }
+      } else {
+        while(<KEYFILE>) { print KHFILE "$hostname,$shorthostname," . $_; }
+      }
+      close(KEYFILE);
+    } else {
+      if ( $verbose ) {
+        print "Warning: Unable to get shared lock for host $hostname. Skipping.\n";
+      }
+    }
+    close(KEYLOCK);
+  }
+  close(KHFILE);
+  if ( $known_hosts_copy ) {
+    copy($known_hosts,$known_hosts_copy) or die "Unable to copy known_hosts to $known_hosts_copy";
+  }
+  close(KHLOCK);
+}
+
+my $help;
+my $genknownhosts;
+my $host = '';
+my $user = '';
+my $rsa = '';
+my $dsa = '';
+my $private = '';
+my $cmthost = '';
+my $authkeyshost = '';
+my $escquotes = '';
+GetOptions("h|?|help"		=> \$help,
+           "g|genknownhosts"	=> \$genknownhosts,
+	   "r|host=s"		=> \$host,
+	   "u|user=s"		=> \$user,
+	   "rsa"		=> \$rsa,
+	   "dsa"		=> \$dsa,
+	   "p|private"		=> \$private,
+	   "c|cmthost=s"	=> \$cmthost,
+	   "a|authkeys=s"	=> \$authkeyshost,
+           "e|escquotes"	=> \$escquotes,
+	   "v|verbose"		=> \$verbose ) or usage(1);
+usage(1) if $help;
+
+if ( ! -d $hostkeydir or ! -w $hostkeydir ) {
+  die "host key repository directory ($hostkeydir) does not exist or is not writeable";
+}
+if ( ! -d $userkeydir or ! -w $userkeydir ) {
+  die "user key repository directory ($userkeydir) does not exist or is not writeable";
+}
+
+# default to returning both keys if none specified
+if ( ! ($rsa or $dsa) ) {
+  $rsa = 1;
+  $dsa = 1;
+}
+
+if ( $genknownhosts ) {
+  gen_known_hosts();
+} elsif ( $host ) {
+  if ( $rsa ) { gen_ssh_host_key($host,"rsa",$private) }
+  if ( $dsa ) { gen_ssh_host_key($host,"dsa",$private) }
+} elsif ( $user ) {
+  if ( ! $cmthost ) {
+    $cmthost = hostfqdn();
+  }
+  if ( $private ) {
+    if ( $rsa ) { gen_ssh_user_key($user,"rsa",$private,$cmthost) }
+    if ( $dsa ) { gen_ssh_user_key($user,"dsa",$private,$cmthost) }
+  } else {
+    if ( $rsa ) {
+      gen_ssh_user_key($user,"rsa",$private,$cmthost,$authkeyshost,$escquotes)
+    }
+    if ( $dsa ) {
+      gen_ssh_user_key($user,"dsa",$private,$cmthost,$authkeyshost,$escquotes)
+    }
+  }
+} else {
+  usage(1);
+}
+
+exit 0;

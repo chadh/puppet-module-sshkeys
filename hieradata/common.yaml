@@ -1,0 +1,11 @@
+---
+sshkeys::install::bindir: '/usr/bin'
+sshkeys::install::user: 'puppet'
+sshkeys::install::hostkeydir: '/etc/puppet/hostkeys'
+sshkeys::install::userkeydir: '/etc/puppet/userkeys'
+sshkeys::install::keygen: '/usr/bin/ssh-keygen'
+sshkeys::install::keygenopts: "-q -N ''"
+sshkeys::install::knownhosts_servedir: 'UNSET'
+sshkeys::privatekey::type: 'rsa'
+  
+sshkeys::authorizedkey::keytype: 'rsa'

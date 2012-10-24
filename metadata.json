@@ -11,7 +11,7 @@
     "Modulefile": "2e9d07cb9eab039bedf06e22115a88ae",
     "README": "5c2708b09fc91541c72ec94edaa397bb",
     "hieradata/common.yaml": "ea4d7e4859ecb8e508e916169be52437",
-    "manifests/authorizedkey.pp": "b3c1ea363736efd590000c48382f9753",
+    "manifests/authorizedkey.pp": "578c9cca722564ccfa96df264472e50f",
     "manifests/init.pp": "a95edf76a889f55286ed7dee375dd735",
     "manifests/install.pp": "7991d4f7b3f9cf7f698f576e2daf1401",
     "manifests/privatekey.pp": "a5f1207632dd4b4995f85435139b3ac9",

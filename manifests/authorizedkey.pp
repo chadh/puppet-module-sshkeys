@@ -19,7 +19,7 @@ define sshkeys::authorizedkey (
 
   if $authorizedkey_file == 'UNSET' {
     ssh_authorized_key { $name:
-      ensure  => present,
+      ensure  => $ensure,
       key     => $rawkey,
       options => $keyopts,
       user    => $dstuser,

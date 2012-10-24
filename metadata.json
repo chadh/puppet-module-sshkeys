@@ -11,10 +11,9 @@
     "Modulefile": "2e9d07cb9eab039bedf06e22115a88ae",
     "README": "5c2708b09fc91541c72ec94edaa397bb",
     "hieradata/common.yaml": "72d903968ca64c0af2f10f000723a843",
-    "manifests/authorizedkey.pp": "576a5a8fea55ba4473ee79ac1f50ca13",
+    "manifests/authorizedkey.pp": "547ddd10635eee6e3c3e4a0bd6077c0b",
     "manifests/init.pp": "a95edf76a889f55286ed7dee375dd735",
-    "manifests/install.pp": "eb75e2f820f6f8149858249c01e906b0",
-    "manifests/knownhostsserver.pp": "f2620e3d167fac1deff7185550841d0c",
+    "manifests/install.pp": "7991d4f7b3f9cf7f698f576e2daf1401",
     "manifests/privatekey.pp": "92a92b1fdd7b1294586e701afbc444b8",
     "templates/sshkeys.pl.erb": "8113bc7a15d4e48b401fb7f3f966b9a9"
   },

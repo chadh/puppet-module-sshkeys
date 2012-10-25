@@ -1,5 +1,5 @@
 ---
-sshkeys::install::bindir: '/usr/bin'
+sshkeys::bindir: '/usr/bin'
 sshkeys::install::user: 'puppet'
 sshkeys::install::hostkeydir: '/etc/puppet/hostkeys'
 sshkeys::install::userkeydir: '/etc/puppet/userkeys'

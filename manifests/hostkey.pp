@@ -12,10 +12,10 @@ define sshkeys::hostkey(
     default => '--dsa',
   }
   if $private {
-    $key = generate($sshkeys::install::scriptname, '--private', $typeopt, '--host', $keyhost)
+    $key = generate($sshkeys::scriptname, '--private', $typeopt, '--host', $keyhost)
     $mode = $privmode
   } else {
-    $key = generate($sshkeys::install::scriptname, $typeopt, '--host', $keyhost)
+    $key = generate($sshkeys::scriptname, $typeopt, '--host', $keyhost)
     $mode = $pubmode
   }
   file { $name:

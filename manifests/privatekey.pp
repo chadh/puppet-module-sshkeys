@@ -13,7 +13,7 @@
     }
   
     file { $name:
-      content => generate($sshkeys::install::scriptname,
+      content => generate($sshkeys::scriptname,
         '--private',
         '--user', $user,
         '--cmthost', $host,

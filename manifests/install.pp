@@ -1,5 +1,4 @@
 class sshkeys::install(
-  $bindir,
   $user,
   $hostkeydir,
   $userkeydir,
@@ -7,9 +6,8 @@ class sshkeys::install(
   $keygenopts,
   $knownhosts_servedir,
 ) {
-  $scriptname = "${bindir}/sshkeys.pl"
   
-  file { $scriptname:
+  file { $sshkeys::scriptname:
     content => template('sshkeys/sshkeys.pl.erb'),
     mode    => '0500',
     owner   => $user,
@@ -31,7 +29,7 @@ class sshkeys::install(
   }
 
   cron { 'genknownhosts':
-    command => "$scriptname --genknownhosts",
+    command => "$sshkeys::scriptname --genknownhosts",
     user    => 'root',
     minute  => [ 0,10,20,30,40,50 ],
   }  

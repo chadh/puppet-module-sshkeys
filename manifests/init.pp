@@ -11,6 +11,8 @@
 # Sample Usage:
 #
 # [Remember: No empty lines between comments and class definition]
-class sshkeys {
-  include sshkeys::install
+class sshkeys(
+  $bindir,
+) {
+  $scriptname = "${bindir}/sshkeys.pl"
 }

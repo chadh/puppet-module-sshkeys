@@ -12,9 +12,10 @@
     "README": "5c2708b09fc91541c72ec94edaa397bb",
     "hieradata/common.yaml": "ea4d7e4859ecb8e508e916169be52437",
     "manifests/authorizedkey.pp": "578c9cca722564ccfa96df264472e50f",
+    "manifests/hostkey.pp": "110c20e4b9fb28ec16f3eb10023d10f2",
     "manifests/init.pp": "a95edf76a889f55286ed7dee375dd735",
     "manifests/install.pp": "7991d4f7b3f9cf7f698f576e2daf1401",
-    "manifests/privatekey.pp": "a5f1207632dd4b4995f85435139b3ac9",
+    "manifests/privatekey.pp": "dd9ed434f125a8a79eb5cbce98a24589",
     "templates/sshkeys.pl.erb": "c4c89ffc9325bbc5ce4a9878fd1bd9ea"
   },
   "dependencies": [

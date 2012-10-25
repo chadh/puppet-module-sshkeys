@@ -22,6 +22,5 @@
       mode => '0400',
       owner => $user,
       group => 'root',
-      require => File[$sshkeys::install::scriptname],
     }
   }

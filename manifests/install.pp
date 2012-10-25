@@ -22,6 +22,13 @@ class sshkeys::install(
     owner  => $user,
     group  => 'root',
   }
+  
+  file { "$hostkeydir/.known_hosts.lck":
+    content => '',
+    mode => '0600',
+    owner => $user,
+    group => 'root',
+  }
 
   cron { 'genknownhosts':
     command => "$scriptname --genknownhosts",

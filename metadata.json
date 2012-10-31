@@ -8,20 +8,24 @@
   "summary": "College of Computing @ Georgia Tech  sshkeys Module",
   "version": "0.0.1",
   "checksums": {
-    "Modulefile": "2e9d07cb9eab039bedf06e22115a88ae",
+    "Modulefile": "1d5ee2c152075eaa1e7a686e9f6308aa",
     "README": "5c2708b09fc91541c72ec94edaa397bb",
-    "hieradata/common.yaml": "2a4530b77cab5782d428e7b66c7b17f9",
+    "hieradata/common.yaml": "b74cf9b5924aa94e38e97f9bf20c3418",
     "manifests/authorizedkey.pp": "e23bb18c19f0732ba8899be8fe25553e",
-    "manifests/hostkey.pp": "7ef0347dd73c5010cb682cde5428c35e",
+    "manifests/hostkeys.pp": "1685961685bc7963ca5bf504232f8eb8",
     "manifests/init.pp": "c82b971abde3a759e0f861369193e221",
-    "manifests/install.pp": "3a0aa027b68fba814136c328f6faff90",
+    "manifests/install.pp": "121391087073f7d563a0d46890ac922a",
     "manifests/privatekey.pp": "7ae7ad917fa22d688bb0835360bdd248",
     "templates/sshkeys.pl.erb": "c4c89ffc9325bbc5ce4a9878fd1bd9ea"
   },
   "dependencies": [
     {
       "name": "gtcoc/ccbp",
-      "version_requirement": "\u003d\u003d0.0.1"
+      "version_requirement": "\u003e\u003d0.0.1"
+    },
+    {
+      "name": "gtcoc/openssh",
+      "version_requirement": "\u003e\u003d0.0.1"
     }
   ]
 }

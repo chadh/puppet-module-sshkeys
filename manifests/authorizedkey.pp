@@ -10,6 +10,7 @@ define sshkeys::authorizedkey (
   $authorizedkey_file = 'UNSET',
   $keytype = 'rsa',
 ) {
+  include sshkeys
   # FIXME This is a total hack.  sshkeys.pl returns a key in the form "options ssh-rsa KEY foo@bar"
   # so we split them out here.  Really, we should refactor the sshkeys.pl script (or store them elsewhere)
   $key = generate($sshkeys::scriptname, '--user', $srcuser, "--${keytype}", '--authkeys', $srchost, '--cmthost', $srchost)

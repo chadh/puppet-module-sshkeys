@@ -6,6 +6,7 @@ class sshkeys::install(
   $keygenopts,
   $knownhosts_servedir,
 ) {
+  include sshkeys
   
   file { $sshkeys::scriptname:
     content => template('sshkeys/sshkeys.pl.erb'),

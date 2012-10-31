@@ -3,6 +3,8 @@
     $host,
     $type = 'rsa'
   ) {
+    include sshkeys
+
     $typeopt = $type ? {
       'rsa' => '--rsa',
       'dsa' => '--dsa',

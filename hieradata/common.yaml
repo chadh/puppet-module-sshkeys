@@ -6,3 +6,7 @@ sshkeys::install::userkeydir: '/etc/puppet/userkeys'
 sshkeys::install::keygen: '/usr/bin/ssh-keygen'
 sshkeys::install::keygenopts: "-q -N ''"
 sshkeys::install::knownhosts_servedir: 'UNSET'
+sshkeys::hostkeys::owner: 'root'
+sshkeys::hostkeys::group: 'root'
+sshkeys::hostkeys::privmode: '0400'
+sshkeys::hostkeys::pubmode: '0444'

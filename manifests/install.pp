@@ -22,6 +22,15 @@ class sshkeys::install(
     group  => 'root',
   }
   
+  if $knownhosts_servedir != 'UNSET' {
+    file { $knownhosts_servedir:
+      ensure => directory,
+      mode => '755',
+      owner => $user,
+      group => 'root',
+    }
+  }
+  
   file { "$hostkeydir/.known_hosts.lck":
     content => '',
     mode => '0600',

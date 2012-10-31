@@ -14,7 +14,7 @@
     "manifests/authorizedkey.pp": "f77d26d442cb1e4eddbd840c13b86149",
     "manifests/hostkeys.pp": "34c3043c0d2fa1255bf2d0625b67eafd",
     "manifests/init.pp": "c82b971abde3a759e0f861369193e221",
-    "manifests/install.pp": "121391087073f7d563a0d46890ac922a",
+    "manifests/install.pp": "23d46e6663706c2bf38934bec6f49b2c",
     "manifests/privatekey.pp": "1f2c8389dc41b41da8be1d83d6a993f6",
     "templates/sshkeys.pl.erb": "c4c89ffc9325bbc5ce4a9878fd1bd9ea"
   },

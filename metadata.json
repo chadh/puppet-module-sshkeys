@@ -12,7 +12,7 @@
     "README": "5c2708b09fc91541c72ec94edaa397bb",
     "hieradata/common.yaml": "b74cf9b5924aa94e38e97f9bf20c3418",
     "manifests/authorizedkey.pp": "f77d26d442cb1e4eddbd840c13b86149",
-    "manifests/hostkeys.pp": "49cf143c25fd47a427d8c56c025dde4b",
+    "manifests/hostkeys.pp": "34c3043c0d2fa1255bf2d0625b67eafd",
     "manifests/init.pp": "c82b971abde3a759e0f861369193e221",
     "manifests/install.pp": "121391087073f7d563a0d46890ac922a",
     "manifests/privatekey.pp": "1f2c8389dc41b41da8be1d83d6a993f6",

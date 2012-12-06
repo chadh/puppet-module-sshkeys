@@ -25,7 +25,6 @@ define sshkeys::authorizedkey (
       options => $keyopts,
       user    => $dstuser,
       type    => $keytype,
-      require => File[$sshkeys::scriptname]
     }
   } else {
     ssh_authorized_key { $name:
@@ -35,7 +34,6 @@ define sshkeys::authorizedkey (
       user    => $dstuser,
       target  => $authorizedkey_file,
       type    => $keytype,
-      require => File[$sshkeys::scriptname]
     }
   }
 }

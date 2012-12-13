@@ -270,10 +270,20 @@ sub gen_known_hosts {
     }
     if ( shlock('KEYLOCK',5) ) {
       open(KEYFILE,'<',$hostkey);
+      my $hoststr;
       if ( $ip ) {
-        while(<KEYFILE>) { print KHFILE "$hostname,$shorthostname,$ip " . $_; }
+        $hoststr = "$hostname,$shorthostname,$ip";
       } else {
-        while(<KEYFILE>) { print KHFILE "$hostname,$shorthostname," . $_; }
+        $hoststr = "$hostname,$shorthostname";
+      }
+      my $keyline = <KEYFILE>;
+      my $keyhost = $keyline;
+      $keyhost =~ s/(.*?) ssh-rsa.*/$1/;
+      if ( $keyhost ne $keyline ) {
+        print "Keyhost is $keyhost\n";
+        print KHFILE "$hoststr," . $keyline;
+      } else {
+        print KHFILE "$hoststr " . $keyline;
       }
       close(KEYFILE);
     } else {

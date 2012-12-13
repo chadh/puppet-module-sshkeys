@@ -280,7 +280,6 @@ sub gen_known_hosts {
       my $keyhost = $keyline;
       $keyhost =~ s/(.*?) ssh-rsa.*/$1/;
       if ( $keyhost ne $keyline ) {
-        print "Keyhost is $keyhost\n";
         print KHFILE "$hoststr," . $keyline;
       } else {
         print KHFILE "$hoststr " . $keyline;

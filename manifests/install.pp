@@ -4,6 +4,7 @@ class sshkeys::install(
   $userkeydir,
   $keygen,
   $keygenopts,
+  $useknownhosts,
   $knownhosts_servedir,
 ) {
   include sshkeys
@@ -21,26 +22,28 @@ class sshkeys::install(
     owner  => $user,
     group  => 'root',
   }
-  
-  if $knownhosts_servedir != 'UNSET' {
-    file { $knownhosts_servedir:
-      ensure => directory,
-      mode => '755',
+
+  if $useknownhosts {
+    if $knownhosts_servedir != 'UNSET' {
+      file { $knownhosts_servedir:
+        ensure => directory,
+        mode => '755',
+        owner => $user,
+        group => 'root',
+      }
+    }
+
+    file { "$hostkeydir/.known_hosts.lck":
+      content => '',
+      mode => '0600',
       owner => $user,
       group => 'root',
     }
-  }
-  
-  file { "$hostkeydir/.known_hosts.lck":
-    content => '',
-    mode => '0600',
-    owner => $user,
-    group => 'root',
-  }
 
-  cron { 'genknownhosts':
-    command => "$sshkeys::scriptname --genknownhosts",
-    user    => 'root',
-    minute  => [ 0,10,20,30,40,50 ],
-  }  
+    cron { 'genknownhosts':
+      command => "$sshkeys::scriptname --genknownhosts",
+      user    => 'root',
+      minute  => [ 0,10,20,30,40,50 ],
+    }  
+  }
 }
